@@ -1,0 +1,165 @@
+package handlers
+
+func MainPage(w http.ResponseWriter, r *http.Request) {
+	data := map[string]interface{}{}
+	data["Premission"] = true
+	n, err := template.ParseFiles("htmlt/main.html")
+	if err != nil {
+		logrus.Print(err)
+	}
+	if r.Method == "POST" {
+		cookie, err := r.Cookie("user_id")
+		if err != nil {
+			data["Error"] = "Login to have premission to add task"
+		} else {
+			dateOfTask, NameOfTask, DescriptionOfTask := r.FormValue("UserTimeOfTask"), r.FormValue("NameOfUserTask"), r.FormValue("UserDescriptionOfTask")
+			smrt, err := db.Prepare("INSERT INTO utasks (NameOfTask, DescriptionOfTask, User_id, DateOfTask ) VALUES (?, ?, ?, ?)")
+			if err != nil {
+				logrus.Print(err)
+			}
+			defer smrt.Close()
+			userID := cookie.Value
+			_, err = smrt.Exec(NameOfTask, DescriptionOfTask, userID, dateOfTask)
+			if err != nil {
+				logrus.Print(err)
+			}
+			http.Redirect(w, r, "/main", http.StatusSeeOther)
+		}
+
+	}
+	if r.Method == "GET" {
+		cookie, err := r.Cookie("user_id")
+		if err != nil {
+			data["Premission"] = false
+			data["Error"] = "Please login to have a premission to your tasks "
+		} else {
+			row, _ := db.Query("SELECT id ,NameOfTask, DescriptionOfTask, DateOfTask  FROM utasks WHERE User_id = ?", cookie.Value)
+			IsOk := row.Next()
+			if !IsOk {
+				data["Tasks"] = "To add task press button"
+			} else {
+				var task []Tasks
+				for ok := IsOk; ok; ok = row.Next() {
+					var oneTask UserTasks
+					err = row.Scan(&oneTask.ID, &oneTask.nots, &oneTask.dots, &oneTask.TimeOfTask)
+					if err != nil {
+						logrus.Print(err)
+					}
+					formatedDate := string(oneTask.TimeOfTask)
+					formatedTask := fmt.Sprintf("%s - %s", oneTask.nots, oneTask.dots)
+					task = append(task, Tasks{Id: oneTask.ID, Name: formatedTask, Data: formatedDate})
+
+				}
+				data["Tasks"] = task
+			}
+		}
+	}
+
+	err = n.ExecuteTemplate(w, "main", data)
+	if err != nil {
+		log.Print(err)
+	}
+}
+
+func register(w http.ResponseWriter, r *http.Request) {
+	n, err := template.ParseFiles("htmlt/registration.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+	data := map[string]interface{}{}
+	if r.Method == "POST" {
+		f1, f2 := true, true
+		data["Error"] = "You create your account succsesfull"
+		email := r.FormValue("useremail")
+		parts := strings.Split(email, "@")
+
+		domain := parts[1]
+		if domain != "gmail.com" {
+			data["Error"] = "you dont use gmail.com"
+			f1 = false
+		}
+		name, password := r.FormValue("username"), r.FormValue("userpassword")
+		HashedPassword, err := HashPassword(password)
+		if err != nil {
+			logrus.Print(err)
+		}
+		logrus.Print(HashedPassword)
+		_, err = db.Exec("INSERT INTO login (name, password, email) VALUES (?, ?, ?)", name, HashedPassword, email)
+		if err != nil {
+			if strings.Contains(err.Error(), "Duplicate entry") {
+				data["Error"] = "This person was registered later"
+				f2 = false
+			}
+		}
+		if f1 && f2 {
+			log.Println("User was Registred")
+			var id string
+			err = db.QueryRow("SELECT id FROM login WHERE name = ?", name).Scan(&id)
+			if err != nil {
+				log.Print(err)
+			}
+			http.SetCookie(w, &http.Cookie{
+				Name:     "user_id",
+				Value:    id,
+				Path:     "/",
+				HttpOnly: true,
+				MaxAge:   3600,
+			})
+			http.Redirect(w, r, "/main", http.StatusSeeOther)
+		}
+	}
+	err = n.ExecuteTemplate(w, "register", data)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+func login(w http.ResponseWriter, r *http.Request) {
+	n, err := template.ParseFiles("htmlt/login.html")
+	if err != nil {
+		log.Print(err)
+	}
+	data := map[string]interface{}{}
+
+	if r.Method == "POST" {
+		smrt, err := db.Prepare("SELECT password FROM login WhERE name = ?")
+		if err != nil {
+			log.Print(err)
+		}
+		defer smrt.Close()
+		username := r.FormValue("username")
+		userpassword := r.FormValue("userpassword")
+		var password string
+		err = smrt.QueryRow(username).Scan(&password)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				data["Error"] = "User with that login is undefiend"
+			} else {
+				log.Fatal(err)
+			}
+		} else {
+			err = bcrypt.CompareHashAndPassword([]byte(password), []byte(userpassword))
+			if err == nil {
+				var id string
+				err = db.QueryRow("SELECT id FROM login WHERE name = ?", username).Scan(&id)
+				if err != nil {
+					log.Fatal(err)
+				}
+				http.SetCookie(w, &http.Cookie{
+					Name:     "user_id",
+					Value:    id,
+					Path:     "/",
+					HttpOnly: true,
+					MaxAge:   3600,
+				})
+				http.Redirect(w, r, "/main", http.StatusSeeOther)
+			} else {
+				data["Error"] = "Your information is ancorrect"
+			}
+		}
+	}
+	err = n.ExecuteTemplate(w, "login", data)
+	if err != nil {
+		log.Print(err)
+	}
+}
