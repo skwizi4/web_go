@@ -1,0 +1,12 @@
+package main
+
+func main() {
+	router := mux.NewRouter()
+	router.Use(loggingMiddleware)
+	router.HandleFunc("/main", MainPage)
+	router.HandleFunc("/register", register)
+	router.HandleFunc("/login", login)
+	router.HandleFunc("/main/{id}", WorkWithTask).Methods("POST")
+	fmt.Println("Server is listening...")
+	http.ListenAndServe(":8080", router)
+}
