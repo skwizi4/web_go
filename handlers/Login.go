@@ -53,7 +53,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 				})
 				http.Redirect(w, r, "/main", http.StatusSeeOther)
 			} else {
-				data["Error"] = "Your information is ancorrect"
+				data["Error"] = "Your password is ancorrect"
 			}
 		}
 	}
