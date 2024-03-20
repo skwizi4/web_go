@@ -1,0 +1,56 @@
+{{define "main"}}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1 class="forh1">TO-DO-LIST</h1>
+    <h2 class="forh1">Enter your task</h2>
+    <form method="POST" action="/main" >
+        <input placeholder="Enter name of task" type="text" name="NameOfUserTask"  required/><br><br>
+        <input placeholder="Enter description of task" type="text" name="UserDescriptionOfTask"  required/><br><br>
+        <input placeholder="Enter a date of your task" type="datetime-local" name="UserTimeOfTask" >
+        <input  type="submit" value="Add" />
+    </form>
+    {{if .Premission}}
+    <a href="/register">
+        <button class="buttonForReg">Want to regsiter new account?</button>
+    </a>
+    <a href="/login">
+        <button class="buttonForReg">Want to login in other account?</button>
+    </a>
+
+    {{range .Tasks}}
+    <p>{{.Name}} - {{.Description}} {{.Data}}</p>
+
+            <form action="/main/{{.Id}}" method="POST">
+                <input type="hidden" name="action" value="delete">
+                <input type="submit" value="Удалить">
+            </form>
+          
+        {{end}}
+    {{else}}
+
+    <a href="/register">
+        <button class="buttonForReg">Not register yet?</button>
+    </a>
+    <a href="/login">
+        <button class="buttonForReg">Login</button>
+    </a>
+    <p>{{.Error}}</p>
+    {{end}}
+   
+</body>
+<style>
+    .forh1{
+        text-align: center;
+    }
+    .buttonForReg{
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+</html>
+{{end}}

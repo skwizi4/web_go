@@ -1,0 +1,159 @@
+
+    {{define "register"}}
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Ввод данных</title>
+        </head>
+        <body>
+            <section>
+                <div class="form-box">
+                    <div class="form-value">
+                        <h2 class="p">Ввод данных</h2>
+                            <form method="POST" action="/register" >
+                                <div class="inputbox">
+                                    <input type="text" id="username" name="username" pattern="[A-Za-z0-9]*" title="Please use only English characters and numbers" required>
+                                    <label class="" for="username">Enter your login</label>
+                                </div>
+                                <div class="inputbox">
+                                    <input type="password" name="userpassword" pattern="[A-Za-z0-9]*" title="Please use only English characters and numbers" required/><br><br>
+                                    <label class="" for="userpassword" > Enter your password</label>
+                                    <p>{{.ErrorPassword}}</p>
+                                </div>
+                                <div class="inputbox">
+                                    <input  type="email" name="useremail" pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*"  required /><br><br>
+                                    <label class="" for="useremail"> Enter email</label>
+                                </div>
+                                <div class="forget">
+                                    <input  type="submit" value="register" />
+                                </div>
+        
+                        <p>{{.Error}}</p>
+                        </form>
+                        <a href="/login">
+                            <button class="logint">You already have an account? Login</button>
+                        </a>
+                        <a href="/main">
+                            <button class="logint">on the main page</button>
+                        </a>
+                    </div>
+                    
+                </div>
+            </section>
+        </body>
+        <style>
+            body{
+            background-image: url(https://www.liga.net/images/general/2023/12/22/20231222120634-4149.jpg?v=1703239740);
+            }
+            section{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                width: 100%;
+                background-position: center;
+                background-size: cover;
+            }
+            .inputbox{
+                position: relative;
+                margin: 30px 0;
+                width: 310px;
+                border-bottom: 2px solid #fff;
+            }
+            .inputbox label{
+                position: absolute;
+                top: 50%;
+                left: 5px;
+                transform: translateY(-50%);
+                color: #fff;
+                font-size: 1em;
+                pointer-events: none;
+                transition: .5s;
+            }
+            .inputbox input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .inputbox label {
+                position: absolute;
+                left: 0;
+                width: 100%;
+                transition: 0.2s;
+            }
+            .inputbox input:valid + label,
+            .inputbox input:focus + label {
+            transform: translateY(-20px);
+            }
+
+            .inputbox ion-icon{
+                position: absolute;
+                right: 8px;
+                color: #fff;
+                font-size: 1.2em;
+                top: 20px;
+            }
+            .logint{
+                width: 100%;
+                height: 40px;
+                border-radius: 40px;
+                background: #fff;
+                border: none;
+                outline: none;
+                cursor: pointer;
+                font-size: 1em;
+                font-weight: 600;
+                margin: 25px 0 10px;
+            }
+            h2{
+                color: #fff;
+                font-size: 2em;
+                text-align: center;
+            }
+            .form-box{
+                position: relative;
+                width: 400px;
+                height: 450px;
+                background: transparent;
+                border: 2px solid rgba(255, 255, 255, 0.5);
+                border-radius: 20px;
+                backdrop-filter: blur(15px);
+                display: flex;
+                justify-content: center;
+            }
+            .inputbox input{
+                width: 100%;
+                height: 50px;
+                background: transparent;
+                border: none;
+                outline: none;
+                font-size: 1em;
+                padding: 0 35px 0 5px;
+                color: #fff;
+            }
+            input:focus ~ label,
+            input:valid ~ label{
+                top: -5px;
+            }
+            .forget{
+                margin: -15px 0 15px;
+                font-size: .9em;
+                color: #fff;
+                display: flex;
+                justify-content: space-between;
+            }
+            .login-box{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 400px;
+                padding: 40px;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0,5);
+                box-sizing: border-box;
+                box-shadow: 0 15px 25px rgba(0, 0, 0, 0,6);
+                border-radius: 10px;
+            }
+        </style>
+    </html>
+    {{end}}

@@ -1,0 +1,52 @@
+{{define "login"}}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Ввод данных</title>
+    </head>
+    <body>
+        <h2 class="p">Login</h2>
+        <form action="/login" method="POST">
+            <label for="username">Username/login:</label><br>
+            <input type="text" id="username" name="username" pattern="[A-Za-z0-9]*" title="Please use only English characters and numbers"required><br>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="userpassword" pattern="[A-Za-z0-9]*" title="Please use only English characters and numbers" required><br>
+            <input type="submit" value="Submit">
+            {{ if .Error }}
+		        <p>{{.Error}}</p>
+	        {{ end }}
+          </form>
+          
+        <a href="/register">
+            <button class="logint"> Not registred yet?</button>
+        </a>
+        <a href="/main">
+            <button class="logint"> On the main page</button>
+        </a>
+        
+    </body>
+    <style>
+       .inputbox ion-icon{
+            position: absolute;
+            right: 8px;
+            color: #fff;
+            font-size: 1.2em;
+            top: 20px;
+    }
+        .logint{
+            width: 100%;
+            height: 40px;
+            border-radius: 40px;
+            background: #fff;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+        }
+    </style>
+</html>
+
+{{end}}
