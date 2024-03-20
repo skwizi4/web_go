@@ -23,7 +23,6 @@ func MainPage(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		handleGetRequest(w, r, data)
 	}
-
 	err = n.ExecuteTemplate(w, "main", data)
 	if err != nil {
 		logrus.Print(err)
